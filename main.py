@@ -8,13 +8,14 @@ pd.set_option("display.max_rows", None)
 pd.set_option("display.max_columns", None)
 
 
-def show_plots():
-    manager = plt.get_current_fig_manager()
-    manager.full_screen_toggle()
-    """plt.show(block=False)
-    plt.pause(2)
-    plt.close()"""
-    plt.show()
+def save_figure(fig_name, dpi, transparency, face_color, bbox):
+    plt.savefig(
+        fig_name,
+        dpi=dpi,
+        transparent=transparency,
+        facecolor=face_color,
+        bbox_inches=bbox,
+    )
 
 
 def team_colours(col):
@@ -23,7 +24,6 @@ def team_colours(col):
         "Aston Villa": "#95BFE5",
         "Brentford": "#E30613",
         "Brighton": "#0057B8",
-        "Burnley": "#6C1D45",
         "Chelsea": "#034694",
         "Crystal Palace": "#1B458F",
         "Everton": "#003399",
@@ -33,10 +33,9 @@ def team_colours(col):
         "Manchester City": "#6CABDD",
         "Manchester Utd": "#DA291C",
         "Newcastle Utd": "#241F20",
-        "Norwich City": "#FFF200",
+        "Nott'ham Forest": "E53233",
         "Southampton": "#D71920",
         "Tottenham": "#132257",
-        "Watford": "#FBEE23",
         "West Ham": "#7A263A",
         "Wolves": "#FDB913",
     }
@@ -99,7 +98,7 @@ def plt_titles(plot_title, x_label, y_label):
     plt.title(plot_title)
     plt.xlabel(x_label)
     plt.ylabel(y_label)
-    show_plots()
+    # show_plots()
 
 
 def sort_data_frame(df, col, indent, title, x, y, pct):
@@ -304,7 +303,17 @@ def general_team():
     for index, value in enumerate(df[col_against]):
         plt.text((value * -0.5), index - 0.1, str(value))
 
-    show_plots()
+    # show_plots()
+
+    save_figure(
+        f"figures/possession.png",
+        300,
+        False,
+        "#EFE9E6",
+        "tight",
+    )
+
+    return
 
     sort_data_frame_zeroes(df, "Gls", 0.4, "Goals Scored", "# Assists", "Teams", False)
     sort_data_frame_zeroes(
@@ -826,10 +835,15 @@ def passing_types_teams():
 
 
 general_team()
-nations()
-keeping_teams()
-keeping_players()
-shooting_teams()
-shooting_players()
-passing_teams()
-passing_types_teams()
+# nations()
+# keeping_teams()
+# keeping_players()
+# shooting_teams()
+# shooting_players()
+# passing_teams()
+# passing_types_teams()
+
+# Don't show but save
+# Add format like in matches played
+# Add pl logo in each figure
+# Reformat code
