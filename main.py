@@ -1,14 +1,34 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-import random
+from matplotlib.gridspec import GridSpec
 import requests
 from bs4 import BeautifulSoup, Comment
+from utils import team_colours, secondary_team_colours, ax_logo
 
 pd.set_option("display.max_rows", None)
 pd.set_option("display.max_columns", None)
 
 
-def save_figure(fig_name, dpi, transparency, face_color, bbox):
+def save_figure(fig_name, ax, dpi, transparency, face_color, bbox):
+    ax.annotate(
+        "Stats from fbref.com",
+        (0, 0),
+        (0, -20),
+        fontsize=8,
+        xycoords="axes fraction",
+        textcoords="offset points",
+        va="top",
+    )
+    ax.annotate(
+        "Data Viz by @plvizstats || u/plvizstats",
+        (0, 0),
+        (0, -30),
+        fontsize=8,
+        xycoords="axes fraction",
+        textcoords="offset points",
+        va="top",
+    )
+
     plt.savefig(
         fig_name,
         dpi=dpi,
@@ -16,82 +36,6 @@ def save_figure(fig_name, dpi, transparency, face_color, bbox):
         facecolor=face_color,
         bbox_inches=bbox,
     )
-
-
-def team_colours(col):
-    primary_colour = {
-        "Arsenal": "#EF0107",
-        "Aston Villa": "#95BFE5",
-        "Brentford": "#E30613",
-        "Brighton": "#0057B8",
-        "Chelsea": "#034694",
-        "Crystal Palace": "#1B458F",
-        "Everton": "#003399",
-        "Leeds United": "#FFCD00",
-        "Leicester City": "#003090",
-        "Liverpool": "#C8102E",
-        "Manchester City": "#6CABDD",
-        "Manchester Utd": "#DA291C",
-        "Newcastle Utd": "#241F20",
-        "Nott'ham Forest": "E53233",
-        "Southampton": "#D71920",
-        "Tottenham": "#132257",
-        "West Ham": "#7A263A",
-        "Wolves": "#FDB913",
-    }
-
-    clr = []
-
-    for team in col:
-        if team in primary_colour:
-            clr.append(primary_colour[team])
-        else:
-            print(team)
-    return clr
-
-
-def secondary_team_colours(col):
-    secondary_colour = {
-        "Arsenal": "#9C824A",
-        "Aston Villa": "#670e36",
-        "Brentford": "#140E0C",
-        "Brighton": "#FFCD00",
-        "Burnley": "#99D6EA",
-        "Chelsea": "#6A7AB5",
-        "Crystal Palace": "#C4122E",
-        "Everton": "#FFFFFF",
-        "Leeds United": "#1D428A",
-        "Leicester City": "#FDBE11",
-        "Liverpool": "#00B2A9",
-        "Manchester City": "#1C2C5B",
-        "Manchester Utd": "#FBE122",
-        "Newcastle Utd": "#41B6E6",
-        "Norwich City": "#00A650",
-        "Southampton": "#FFC20E",
-        "Tottenham": "#FFFFFF",
-        "Watford": "#ED2127",
-        "West Ham": "#1BB1E7",
-        "Wolves": "#231F20",
-    }
-    clr = []
-
-    for team in col:
-        if team in secondary_colour:
-            clr.append(secondary_colour[team])
-        else:
-            print(team)
-    return clr
-
-
-def random_colour():
-    clr = []
-    for rnd in range(0, 20):
-        r = random.random()
-        b = random.random()
-        g = random.random()
-        each_clr = (r, b, g)
-        clr.append(each_clr)
-    return clr
 
 
 def plt_titles(plot_title, x_label, y_label):
@@ -285,7 +229,10 @@ def general_team():
     poss_against = (df[col_against]) * -1
     poss_for = df[col_for]
 
-    fig, ax = plt.subplots()
+    fig = plt.figure(figsize=(20, 10))
+    fig.suptitle("Possession Against vs Possession For", fontsize=22)
+    gs = GridSpec(nrows=1, ncols=1)
+    ax = fig.add_subplot(gs[0, 0])
 
     ax.barh(
         labels,
@@ -296,23 +243,16 @@ def general_team():
     ax.barh(labels, poss_for, label="Possession For", color=team_colours(df["Squad"]))
 
     ax.set_ylabel("Teams")
-    ax.set_title("Possession Against vs Possession For")
 
     for index, value in enumerate(df[col_for]):
-        plt.text(value / 2, index - 0.1, str(value))
+        plt.text(value / 2, index - 0.1, str(value), weight="bold")
     for index, value in enumerate(df[col_against]):
-        plt.text((value * -0.5), index - 0.1, str(value))
+        plt.text((value * -0.5), index - 0.1, str(value), weight="bold")
 
-    # show_plots()
+    logo_ax = fig.add_axes([0.8, 0.9, 0.1, 0.1])
+    ax_logo(logo_ax)
 
-    save_figure(
-        f"figures/possession.png",
-        300,
-        False,
-        "#EFE9E6",
-        "tight",
-    )
-
+    save_figure("figures/possession.png", ax, 300, True, "#EFE9E6", "tight")
     return
 
     sort_data_frame_zeroes(df, "Gls", 0.4, "Goals Scored", "# Assists", "Teams", False)
@@ -498,7 +438,7 @@ def keeping_players():
     url = "https://fbref.com/en/comps/9/keepersadv/Premier-League-Stats"
     html = requests.get(url)
     soup = BeautifulSoup(html.text, "html.parser")
-    comments = soup.find_all(string=lambda text: isinstance(text, Comment))  #
+    comments = soup.find_all(string=lambda text: isinstance(text, Comment))
     df = None
     for each in comments:
         if "table" in str(each):
@@ -843,7 +783,7 @@ general_team()
 # passing_teams()
 # passing_types_teams()
 
-# Don't show but save
-# Add format like in matches played
-# Add pl logo in each figure
-# Reformat code
+
+# Refactor
+# Add PL logo
+# Save images
